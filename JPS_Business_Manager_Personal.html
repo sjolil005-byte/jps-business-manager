@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#101827">
+<title>JPS Business Manager</title>
+<style>
+:root{--bg:#f3f5f9;--card:#fff;--ink:#172033;--muted:#687386;--line:#e5e9f0;--accent:#f0b429;--nav:#101827;--green:#138a55;--red:#c23b45}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:var(--nav);color:white;padding:18px 16px 15px;position:sticky;top:0;z-index:5}
+.brand{display:flex;align-items:center;gap:11px}.logo{width:42px;height:42px;border-radius:12px;background:var(--accent);color:#111827;font-weight:900;display:grid;place-items:center;font-size:18px}.brand h1{font-size:18px;margin:0}.brand small{color:#c4cad4}
+main{max-width:850px;margin:auto;padding:14px 13px 90px}.tabs{display:flex;gap:7px;overflow:auto;padding:12px 0 4px}.tab{border:1px solid var(--line);background:white;border-radius:10px;padding:10px 13px;white-space:nowrap;font-weight:650;color:var(--muted)}.tab.active{background:var(--nav);color:white;border-color:var(--nav)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:15px;margin:10px 0;box-shadow:0 3px 12px #15213a08}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.stat{background:white;border:1px solid var(--line);border-radius:14px;padding:13px}.stat small{color:var(--muted)}.stat strong{display:block;font-size:22px;margin-top:5px}
+h2{font-size:18px;margin:6px 0 12px}h3{font-size:15px;margin:0 0 10px}
+label{display:block;font-size:13px;font-weight:650;margin:10px 0 5px;color:#485367}input,select,textarea{width:100%;border:1px solid #d9dfe8;border-radius:10px;padding:12px;font:inherit;background:white;color:var(--ink)}textarea{min-height:70px;resize:vertical}
+button{border:0;border-radius:10px;padding:12px 14px;font:inherit;font-weight:700;background:var(--nav);color:white;cursor:pointer}.primary{background:var(--accent);color:#151515}.secondary{background:#edf1f6;color:#263246}.danger{background:#fff0f0;color:var(--red)}.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}.item{border-top:1px solid var(--line);padding:12px 0}.item:first-child{border-top:0}.itemtop{display:flex;justify-content:space-between;gap:10px}.muted{color:var(--muted);font-size:13px}.money{font-weight:800}.pill{font-size:11px;border-radius:20px;padding:4px 8px;background:#edf1f6;display:inline-block}.pill.Ready,.pill.Delivered{background:#e5f7ed;color:#137748}.pill.Working{background:#fff3d7;color:#8b5a00}.pill.Cancelled{background:#ffeded;color:#b52f39}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.actions button{padding:8px 10px;font-size:12px}.empty{color:var(--muted);text-align:center;padding:22px}.hidden{display:none!important}.foot{font-size:12px;color:var(--muted);text-align:center;margin:22px 0}
+@media(min-width:600px){.stats{grid-template-columns:repeat(4,1fr)}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}}
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="logo">JPS</div><div><h1>JPS Business Manager</h1><small>Jolil Plastic Star · Personal Edition</small></div></div></header>
+<main>
+<div class="tabs">
+<button class="tab active" data-tab="home">হোম</button><button class="tab" data-tab="orders">অর্ডার</button><button class="tab" data-tab="customers">কাস্টমার</button><button class="tab" data-tab="reports">রিপোর্ট</button><button class="tab" data-tab="backup">ব্যাকআপ</button>
+</div>
+<section id="home">
+<div class="stats" id="stats"></div>
+<div class="card"><h2>সাম্প্রতিক অর্ডার</h2><div id="recent"></div></div>
+<div class="card"><h3>নতুন অর্ডার</h3><button class="primary" onclick="showTab('orders');document.getElementById('orderForm').scrollIntoView({behavior:'smooth'})">+ অর্ডার যোগ করুন</button></div>
+</section>
+<section id="orders" class="hidden">
+<div class="card" id="orderForm"><h2>নতুন অর্ডার / পেমেন্ট</h2>
+<div class="formgrid">
+<div><label>কাস্টমারের নাম *</label><input id="oCustomer" placeholder="নাম লিখুন"></div>
+<div><label>ফোন নম্বর</label><input id="oPhone" inputmode="tel" placeholder="মোবাইল নম্বর"></div>
+<div><label>কাজের বিবরণ *</label><input id="oWork" placeholder="যেমন: 3D Glow Signboard"></div>
+<div><label>মোট দাম (₹) *</label><input id="oTotal" type="number" min="0" placeholder="10000"></div>
+<div><label>অগ্রিম টাকা (₹)</label><input id="oAdvance" type="number" min="0" placeholder="3000" value="0"></div>
+<div><label>ডেলিভারির তারিখ</label><input id="oDate" type="date"></div>
+</div>
+<label>নোট</label><textarea id="oNote" placeholder="মাপ, রং বা অন্য নির্দেশ"></textarea>
+<button class="primary" style="width:100%;margin-top:12px" onclick="addOrder()">অর্ডার সেভ করুন</button>
+</div>
+<div class="card"><h2>সব অর্ডার</h2><input id="orderSearch" placeholder="নাম বা কাজ খুঁজুন..." oninput="renderOrders()"><div id="orderList"></div></div>
+</section>
+<section id="customers" class="hidden">
+<div class="card"><h2>কাস্টমার যোগ করুন</h2><label>নাম *</label><input id="cName" placeholder="কাস্টমারের নাম"><label>ফোন</label><input id="cPhone" placeholder="মোবাইল নম্বর"><label>ঠিকানা</label><input id="cAddress" placeholder="ঠিকানা"><button class="primary" style="width:100%;margin-top:12px" onclick="addCustomer()">কাস্টমার সেভ করুন</button></div>
+<div class="card"><h2>কাস্টমার তালিকা</h2><div id="customerList"></div></div>
+</section>
+<section id="reports" class="hidden"><div class="card"><h2>ব্যবসার হিসাব</h2><div id="reportStats"></div></div></section>
+<section id="backup" class="hidden">
+<div class="card"><h2>ডেটা ব্যাকআপ</h2><p class="muted">আপনার তথ্য এই ফোনের এই ব্রাউজারেই সেভ থাকে। ফোন/ব্রাউজার ডেটা মুছে গেলে তথ্য হারাতে পারে। নিয়মিত ব্যাকআপ ডাউনলোড করুন।</p><button class="primary" style="width:100%" onclick="backup()">ব্যাকআপ ডাউনলোড</button><label>ব্যাকআপ ফাইল ফিরিয়ে আনুন</label><input type="file" id="restoreFile" accept="application/json"><button style="width:100%;margin-top:10px" onclick="restore()">রিস্টোর করুন</button><p class="muted">এই ব্যক্তিগত সংস্করণে অনলাইন সিঙ্ক, OTP লগইন বা একাধিক ফোনে ডেটা শেয়ার নেই।</p></div>
+</section>
+<div class="foot">JPS Business Manager · আপনার ব্যক্তিগত হিসাবের জন্য</div>
+</main>
+<script>
+const KEY='jps_personal_v1';
+let db=JSON.parse(localStorage.getItem(KEY)||'{"orders":[],"customers":[]}');
+function save(){localStorage.setItem(KEY,JSON.stringify(db));renderAll()}
+function money(n){return '₹'+Number(n||0).toLocaleString('en-IN')}
+function due(o){return Math.max(0,Number(o.total)-Number(o.paid||0))}
+function showTab(id){document.querySelectorAll('main section').forEach(s=>s.classList.toggle('hidden',s.id!==id));document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+function addOrder(){let name=oCustomer.value.trim(),work=oWork.value.trim(),total=Number(oTotal.value),paid=Number(oAdvance.value||0);if(!name||!work||!(total>0)){alert('নাম, কাজের বিবরণ ও মোট দাম দিন।');return}if(paid>total){alert('অগ্রিম টাকা মোট দামের বেশি হতে পারবে না।');return}
+let o={id:Date.now(),name,phone:oPhone.value.trim(),work,total,paid,status:'Confirmed',date:oDate.value,note:oNote.value.trim(),payments:paid?[{amount:paid,date:new Date().toISOString(),note:'অগ্রিম'}]:[]};db.orders.unshift(o);
+if(!db.customers.some(c=>c.name.toLowerCase()===name.toLowerCase()&&c.phone===o.phone))db.customers.unshift({name,phone:o.phone,address:''});
+['oCustomer','oPhone','oWork','oTotal','oNote','oDate'].forEach(id=>document.getElementById(id).value='');oAdvance.value=0;save();alert('অর্ডার সেভ হয়েছে।')}
+function addCustomer(){let name=cName.value.trim();if(!name){alert('কাস্টমারের নাম দিন।');return}db.customers.unshift({name,phone:cPhone.value.trim(),address:cAddress.value.trim()});cName.value=cPhone.value=cAddress.value='';save()}
+function addPayment(id){let o=db.orders.find(x=>x.id===id),v=Number(prompt('কত টাকা জমা দিলেন?'));if(!v||v<=0)return;if(v>due(o)){alert('বাকি টাকার চেয়ে বেশি দেওয়া যাবে না।');return}o.paid=Number(o.paid)+v;o.payments=o.payments||[];o.payments.push({amount:v,date:new Date().toISOString(),note:'অতিরিক্ত পেমেন্ট'});save()}
+function setStatus(id){let o=db.orders.find(x=>x.id===id),s=prompt('স্ট্যাটাস লিখুন: Confirmed, Working, Ready, Delivered, Cancelled',o.status);if(['Confirmed','Working','Ready','Delivered','Cancelled'].includes(s)){o.status=s;save()}else if(s!==null)alert('সঠিক স্ট্যাটাস লিখুন।')}
+function deleteOrder(id){if(confirm('এই অর্ডার মুছে ফেলবেন?')){db.orders=db.orders.filter(o=>o.id!==id);save()}}
+function orderHTML(o){return `<div class="item"><div class="itemtop"><div><b>${esc(o.name)}</b><div class="muted">${esc(o.work)} ${o.date?'· '+esc(o.date):''}</div><div class="muted">${esc(o.phone||'')}</div></div><span class="pill ${o.status}">${o.status}</span></div><div class="row" style="margin-top:9px"><div><small class="muted">মোট</small><div class="money">${money(o.total)}</div></div><div><small class="muted">জমা</small><div class="money">${money(o.paid)}</div></div><div><small class="muted">বাকি</small><div class="money" style="color:${due(o)?'var(--red)':'var(--green)'}">${money(due(o))}</div></div></div><div class="actions"><button onclick="addPayment(${o.id})">+ পেমেন্ট</button><button class="secondary" onclick="setStatus(${o.id})">স্ট্যাটাস</button><button class="danger" onclick="deleteOrder(${o.id})">মুছুন</button></div>${o.note?`<div class="muted" style="margin-top:7px">নোট: ${esc(o.note)}</div>`:''}</div>`}
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderOrders(){let q=(orderSearch.value||'').toLowerCase(),arr=db.orders.filter(o=>(o.name+' '+o.work+' '+o.phone).toLowerCase().includes(q));orderList.innerHTML=arr.length?arr.map(orderHTML).join(''):'<div class="empty">এখনও কোনো অর্ডার নেই।</div>'}
+function renderCustomers(){customerList.innerHTML=db.customers.length?db.customers.map(c=>`<div class="item"><b>${esc(c.name)}</b><div class="muted">${esc(c.phone)} ${c.address?'· '+esc(c.address):''}</div></div>`).join(''):'<div class="empty">কাস্টমার যোগ করা হয়নি।</div>'}
+function renderAll(){let total=db.orders.reduce((a,o)=>a+Number(o.total),0),paid=db.orders.reduce((a,o)=>a+Number(o.paid||0),0),d= db.orders.reduce((a,o)=>a+due(o),0);stats.innerHTML=`<div class="stat"><small>মোট অর্ডার</small><strong>${db.orders.length}</strong></div><div class="stat"><small>মোট বিক্রি</small><strong>${money(total)}</strong></div><div class="stat"><small>জমা টাকা</small><strong>${money(paid)}</strong></div><div class="stat"><small>মোট বাকি</small><strong style="color:var(--red)">${money(d)}</strong></div>`;recent.innerHTML=db.orders.slice(0,4).map(orderHTML).join('')||'<div class="empty">এখনও কোনো অর্ডার নেই।</div>';renderOrders();renderCustomers();reportStats.innerHTML=`<p>মোট কাস্টমার: <b>${db.customers.length}</b></p><p>মোট অর্ডার: <b>${db.orders.length}</b></p><p>মোট কাজের মূল্য: <b>${money(total)}</b></p><p>মোট টাকা পেয়েছেন: <b>${money(paid)}</b></p><p>এখনও বাকি: <b style="color:var(--red)">${money(d)}</b></p><p>ডেলিভারি হয়েছে: <b>${db.orders.filter(o=>o.status==='Delivered').length}</b></p>`}
+function backup(){let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='JPS-Backup.json';a.click();URL.revokeObjectURL(a.href)}
+function restore(){let f=restoreFile.files[0];if(!f){alert('আগে ব্যাকআপ ফাইল নির্বাচন করুন।');return}let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!Array.isArray(x.orders)||!Array.isArray(x.customers))throw 0;if(confirm('বর্তমান তথ্যের জায়গায় ব্যাকআপের তথ্য বসবে। চালাবেন?')){db=x;save();alert('ব্যাকআপ ফিরিয়ে আনা হয়েছে।')}}catch(e){alert('ফাইলটি সঠিক JPS ব্যাকআপ নয়।')}};r.readAsText(f)}
+renderAll();
+</script>
+</body></html>
